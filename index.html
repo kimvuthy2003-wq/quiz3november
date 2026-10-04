@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>៥. អង្គធាតុអណ្តែត (Quiz 3)</title>
+    <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        body { font-family: 'Hanuman', 'Siemreap', Arial, sans-serif; background-color: #f4f6f9; padding: 20px; color: #111; text-align: center; margin: 0; }
+        /* Tab & Quiz CSS */
+        .tab-container { display: flex; justify-content: center; margin-bottom: 20px; background: #1e293b; padding: 10px; border-radius: 8px; max-width:950px; margin: 0 auto 20px;}
+        .tab-btn { background: #334155; color: #cbd5e1; border: none; padding: 10px 20px; margin: 0 5px; font-size: 16px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: inherit; font-weight: bold;}
+        .tab-btn.active { background: #38bdf8; color: #0f172a; }
+        .tab-btn.quiz-active { background: #2ecc71; color: white; }
+        .tab-content { display: none; max-width: 950px; margin: 0 auto; }
+        .tab-content.active { display: block; }
+        #quiz-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left;}
+        .student-info { background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .student-info select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-family: inherit; font-size: 16px;}
+        .question-block { background: #fdfbfb; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 15px; border-radius: 5px; }
+        .question-block p { font-weight: bold; margin-top: 0; }
+        .question-block label { display: block; margin-bottom: 8px; cursor: pointer; }
+        .submit-btn { background: #2ecc71; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; font-family: inherit;}
+        .submit-btn:hover { background: #27ae60; }
+        /* Modal CSS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 12px; text-align: center; width: 90%; max-width: 400px; }
+        .modal-box h3 { color: #2ecc71; margin-top: 0;}
+        .modal-btn { background: #3498db; color: white; border: none; padding: 10px 30px; font-size: 16px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight:bold;}
+        /* Sim CSS */
+        .problem-statement { background: #fff3cd; color: #664d03; padding: 18px 25px; border-radius: 8px; border-left: 6px solid #ffc107; text-align: left; margin-bottom: 20px; font-size: 17px; font-weight: bold; line-height: 1.8;}
+        .sim-area { position: relative; width: 100%; max-width: 500px; background: #e0f7fa; border: 2px solid #ced4da; border-radius: 8px; overflow: hidden; margin: 0 auto 20px; display: block; }
+        .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .slider-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: bold; text-align: left; }
+        input[type=range] { width: 100%; margin-top: 10px; cursor: pointer; }
+        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .data-box { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.12); text-align: center; font-size: 15px; font-weight: bold; color: #333; }
+        .data-box span { font-weight: 900; font-size: 20px; display: block; margin-top: 8px; }
+        #liveRho { color: #d32f2f; } #liveState { color: #007bff; font-size: 22px; } #liveVw { color: #28a745; } #liveHw { color: #e65100; }
+        .solution-box { background: #e2e8f0; padding: 25px; border-radius: 8px; text-align: left; margin-top: 25px; border-left: 6px solid #4a5568; font-size: 18px; line-height: 1.8; overflow-x: auto;}
+        .note-box { background: #e8f5e9; border-left: 6px solid #28a745; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #1b5e20; }
+        .text-outline { text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; }
+    </style>
+</head>
+<body>
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="openTab(event, 'sim-tab')">១. ពិសោធន៍អាកស៊ីម៉ែត</button>
+        <button class="tab-btn" onclick="openTab(event, 'quiz-tab')">២. កម្រងសំណួរ (Quiz ៣)</button>
+    </div>
+
+    <!-- ផ្នែកទី១: ពិសោធន៍ -->
+    <div id="sim-tab" class="tab-content active">
+        <div class="problem-statement">
+            <strong>៥. អង្គធាតុអណ្តែត ៖</strong> យោងតាមគោលការណ៍អាកស៊ីម៉ែត ប្រសិនបើអង្គធាតុមួយមានម៉ាសមាឌតូចជាងម៉ាសមាឌអង្គធាតុរាវ ($\rho_0 \le \rho_w$) វានឹងអណ្តែត។
+        </div>
+        <div class="sim-area">
+            <svg viewBox="0 0 500 550" preserveAspectRatio="xMidYMid meet">
+                <rect x="102" y="240" width="296" height="258" fill="#4fc3f7" opacity="0.6" />
+                <line x1="102" y1="240" x2="398" y2="240" stroke="#0288d1" stroke-width="2" />
+                <path d="M 100 150 L 100 500 L 400 500 L 400 150" fill="none" stroke="#546e7a" stroke-width="4" />
+                <g id="objectGroup" transform="translate(0, 0)">
+                    <rect id="objRect" x="180" y="100" width="140" height="100" fill="#8d6e63" stroke="#333" stroke-width="2" />
+                    <text id="lblM" x="250" y="150" text-anchor="middle" font-weight="bold" font-size="20" fill="#111" class="text-outline">M</text>
+                    <line id="vecW" x1="250" y1="150" x2="250" y2="250" stroke="#6f42c1" stroke-width="4" />
+                    <polygon id="headW" points="245,250 255,250 250,260" fill="#6f42c1" />
+                    <text id="txtW" x="265" y="240" font-weight="bold" font-size="20" fill="#6f42c1" class="text-outline">W</text>
+                    <line id="vecFb" x1="250" y1="200" x2="250" y2="100" stroke="#28a745" stroke-width="5" />
+                    <polygon id="headFb" points="245,100 255,100 250,90" fill="#28a745" />
+                    <text id="txtFb" x="270" y="110" font-weight="bold" font-size="20" fill="#28a745" class="text-outline">F<tspan dy="5" font-size="14">b</tspan></text>
+                </g>
+                <g id="depthGroup">
+                    <line x1="150" y1="240" x2="250" y2="240" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5,5" />
+                    <line id="hBotLine" x1="150" y1="300" x2="250" y2="300" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5,5" />
+                    <line id="hVertLine" x1="150" y1="240" x2="150" y2="300" stroke="#d32f2f" stroke-width="2" />
+                    <polygon id="hArrTop" points="146,250 154,250 150,240" fill="#d32f2f" />
+                    <polygon id="hArrBot" points="146,290 154,290 150,300" fill="#d32f2f" />
+                    <text id="txtHw" x="110" y="275" font-weight="bold" font-size="18" fill="#d32f2f" dominant-baseline="middle">h<tspan dy="5" font-size="13">w</tspan></text>
+                </g>
+            </svg>
+        </div>
+        <div class="controls-grid">
+            <div class="slider-box">ម៉ាសអង្គធាតុ ($M$) kg:<br><span id="valM" style="color: #6f42c1; font-size:22px;">5.0</span> kg<input type="range" id="sliderM" min="1.0" max="10.0" value="5.0" step="0.1"></div>
+            <div class="slider-box">មាឌសរុបអង្គធាតុ ($V_0$) L:<br><span id="valV0" style="color: #007bff; font-size:22px;">8.0</span> L<input type="range" id="sliderV0" min="2.0" max="15.0" value="8.0" step="0.1"></div>
+        </div>
+        <div class="dashboard">
+            <div class="data-box" style="border-top: 4px solid #d32f2f;">ម៉ាសមាឌអង្គធាតុ $\rho_0$<br><span id="liveRho">625 kg/m&sup3;</span></div>
+            <div class="data-box" style="border-top: 4px solid #007bff;">ស្ថានភាពអង្គធាតុ<br><span id="liveState">អណ្តែត</span></div>
+            <div class="data-box" style="border-top: 4px solid #28a745;">មាឌលិចទឹក $V_w$<br><span id="liveVw">5.0 L</span></div>
+            <div class="data-box" style="border-top: 4px solid #e65100;">ជម្រៅលិចទឹក $h_w$<br><span id="liveHw">12.5 cm</span></div>
+        </div>
+    </div>
+
+    <!-- ផ្នែកទី២: Quiz -->
+    <div id="quiz-tab" class="tab-content">
+        <div id="quiz-container">
+            <h2 style="text-align: center; color: #2c3e50;">កម្រងសំណួរទី៣៖ គោលការណ៍អាកស៊ីម៉ែត (៥០ ពិន្ទុ)</h2>
+            <div class="student-info">
+                <label><b>ជ្រើសរើសថ្នាក់៖</b></label>
+                <select id="classSelect" onchange="updateStudentList()"><option value="G10A">ថ្នាក់ទី ១០A</option><option value="G10B">ថ្នាក់ទី ១០B</option></select>
+                <label><b>ជ្រើសរើសឈ្មោះ៖</b></label>
+                <select id="nameSelect"></select>
+            </div>
+            
+            <div class="question-block">
+                <p>១. អង្គធាតុមួយនឹងអណ្តែតលើទឹកនៅពេលណា?</p>
+                <label><input type="radio" name="q1" value="10"> ក. ម៉ាសមាឌអង្គធាតុតូចជាង ឬស្មើម៉ាសមាឌទឹក</label>
+                <label><input type="radio" name="q1" value="0"> ខ. ម៉ាសមាឌអង្គធាតុធំជាងម៉ាសមាឌទឹក</label>
+                <label><input type="radio" name="q1" value="0"> គ. កម្លាំងទាញរបស់ផែនដីធំជាងកម្លាំងដំណោលអាកស៊ីម៉ែត</label>
+            </div>
+            <div class="question-block">
+                <p>២. កម្លាំងដំណោលអាកស៊ីម៉ែតមានទិសដៅដូចម្តេច?</p>
+                <label><input type="radio" name="q2" value="0"> ក. ឈរចុះក្រោម</label>
+                <label><input type="radio" name="q2" value="10"> ខ. ឈរឡើងលើ</label>
+                <label><input type="radio" name="q2" value="0"> គ. ដេក</label>
+            </div>
+            <div class="question-block">
+                <p>៣. នៅពេលអង្គធាតុស្ថិតក្នុងភាពលំនឹងអណ្តែត តើកម្លាំងដំណោលអាកស៊ីម៉ែត (Fb) មានតម្លៃប៉ុន្មាន?</p>
+                <label><input type="radio" name="q3" value="0"> ក. ស្មើ 0</label>
+                <label><input type="radio" name="q3" value="10"> ខ. ស្មើនឹងទម្ងន់ពិត (W)</label>
+                <label><input type="radio" name="q3" value="0"> គ. តូចជាងទម្ងន់ពិត</label>
+            </div>
+            <div class="question-block">
+                <p>៤. បើអង្គធាតុមានម៉ាសមាឌធំជាងទឹក តើវានឹងមានស្ថានភាពដូចម្តេច?</p>
+                <label><input type="radio" name="q4" value="0"> ក. អណ្តែត</label>
+                <label><input type="radio" name="q4" value="10"> ខ. លិចដល់បាត</label>
+                <label><input type="radio" name="q4" value="0"> គ. ស្ថិតនៅកណ្តាលទឹក</label>
+            </div>
+            <div class="question-block">
+                <p>៥. តើកម្លាំងអ្វីដែលរុញអង្គធាតុឡើងលើពេលដាក់ក្នុងទឹក?</p>
+                <label><input type="radio" name="q5" value="0"> ក. កម្លាំងទំនាញដី</label>
+                <label><input type="radio" name="q5" value="10"> ខ. កម្លាំងដំណោលអាកស៊ីម៉ែត</label>
+                <label><input type="radio" name="q5" value="0"> គ. កម្លាំងកកិត</label>
+            </div>
+            <button id="submitBtn" class="submit-btn" onclick="submitQuiz()">បញ្ជូនចម្លើយទៅកាន់គ្រូ</button>
+        </div>
+    </div>
+
+    <!-- លាក់ឈ្មោះសិស្ស -->
+    <div id="names-10A" style="display: none;">
+        <option value="អេង  សុវណ្ណថារី">អេង  សុវណ្ណថារី</option><option value="ហេង  ច័ន្ទអាយនីង">ហេង  ច័ន្ទអាយនីង</option><option value="ប៊ុន  ខត្តិយាវតី">ប៊ុន  ខត្តិយាវតី</option><option value="ប៉ាក  ច័ន្ទដាវីត">ប៉ាក  ច័ន្ទដាវីត</option><option value="អ៊ីវ សុគន្ធបរមី">អ៊ីវ សុគន្ធបរមី</option><option value="ភូ  លីណា">ភូ  លីណា</option><option value="ពន្លឺ  ពេជ្រចាន់ពិសី្ស">ពន្លឺ  ពេជ្រចាន់ពិសី្ស</option><option value="ប៉ុន  សុវណ្ណា">ប៉ុន  សុវណ្ណា</option><option value="ប៉ុន សុវណ្ណលី">ប៉ុន សុវណ្ណលី</option><option value="ភូ  សុគន្ធវត្តី">ភូ  សុគន្ធវត្តី</option><option value="ឡាយ  ស៊ុនអាន">ឡាយ  ស៊ុនអាន</option><option value="នួន នីណា">នួន នីណា</option><option value="ង៉ែត​  សុគន្ធរក្សា">ង៉ែត​  សុគន្ធរក្សា</option><option value="ហុក  គីមស៊ាន់">ហុក  គីមស៊ាន់</option><option value="សៀន  ពិសិដ្ធ">សៀន  ពិសិដ្ធ</option><option value="លី  សុរក្សា">លី  សុរក្សា</option><option value="គង់  ភារ៉ា">គង់  ភារ៉ា</option><option value="ខន  ស្រីនុត">ខន  ស្រីនុត</option><option value="រិទ្ធ  ទេវរបុត្រ">រិទ្ធ  ទេវរបុត្រ</option><option value="រាជ  បញ្ញាស័ក្ត">រាជ  បញ្ញាស័ក្ត</option><option value="គង់  សំរិទ្ធម៉ីលីង">គង់  សំរិទ្ធម៉ីលីង</option><option value="ស៊ី​  ​​អ៊ុយហុង">ស៊ី​  ​​អ៊ុយហុង</option><option value="សុខា​​  ម៉ានិច">សុខា​​  ម៉ានិច</option><option value="ផាត សុវណ្ណវឌ្ឍនា">ផាត សុវណ្ណវឌ្ឍនា</option><option value="ប៉ែន សុខមាន">ប៉ែន សុខមាន</option><option value="ឆេង​ ឡុងហ៊ូន">ឆេង​ ឡុងហ៊ូន</option><option value="គុយ សុធីរាវិសិដ្ឋនាថ">គុយ សុធីរាវិសិដ្ឋនាថ</option><option value="ម៉ៅ ស្រីហេង">ម៉ៅ ស្រីហេង</option><option value="ញ៉ុន សំភី">ញ៉ុន សំភី</option><option value="យ៉េត ចន្ទចេស្តា">យ៉េត ចន្ទចេស្តា</option>
+    </div>
+    <div id="names-10B" style="display: none;">
+        <option value="លីម​  នូស៊ីម">លីម​  នូស៊ីម</option><option value="មុន្នី  ករុណា">មុន្នី  ករុណា</option><option value="សុវណ្ណ  អាលីហ្សា">សុវណ្ណ  អាលីហ្សា</option><option value="ង៉ែត  ប៊ុនហ៊ួត">ង៉ែត  ប៊ុនហ៊ួត</option><option value="ហង្ស  ពេជ្រពិសី">ហង្ស  ពេជ្រពិសី</option><option value="ស៊ឹង សុវណ្ណរាជ្យ">ស៊ឹង សុវណ្ណរាជ្យ</option><option value="សម  សុបញ្ញា">សម  សុបញ្ញា</option><option value="វិន  សិលា">វិន  សិលា</option><option value="ធា  ណារី">ធា  ណារី</option><option value="សុខ  ពន្លឺ">សុខ  ពន្លឺ</option><option value="រុន  រស្មី">រុន  រស្មី</option><option value="ខូវ  ឡាយអ៊ូ">ខូវ  ឡាយអ៊ូ</option><option value="លីម  គីមឡេង">លីម  គីមឡេង</option><option value="ច័ន្ទ  ​សុខុមវីរៈបុត្រ">ច័ន្ទ  ​សុខុមវីរៈបុត្រ</option><option value="ជួង  ​សិទ្ធិរាជ">ជួង  ​សិទ្ធិរាជ</option><option value="ណាង​  ណយ">ណាង​  ណយ</option><option value="ថាន់  គឹមឡាយ">ថាន់  គឹមឡាយ</option><option value="ថា  គឹមឡុង">ថា  គឹមឡុង</option><option value="​សុខា​  ម៉ាសូជីន">​សុខា​  ម៉ាសូជីន</option><option value="ញ៉ែត សេង">ញ៉ែត សេង</option><option value="ទេព លីហ្សា">ទេព លីហ្សា</option><option value="ទ្រី លីហុង">ទ្រី លីហុង</option><option value="ម៉េង​ កែវពេជ្របូរម៉ី">ម៉េង​ កែវពេជ្របូរម៉ី</option><option value="វ៉ាត ជីហេង">វ៉ាត ជីហេង</option><option value="តាន់ ឈីងឈីង">តាន់ ឈីងឈីង</option>
+    </div>
+
+    <!-- Modal -->
+    <div id="successModal" class="modal-overlay"><div class="modal-box"><h3>✅ ជោគជ័យ!</h3><p id="modalMessage"></p><button class="modal-btn" onclick="closeModal()">OK (យល់ព្រម)</button></div></div>
+
+    <script>
+        // ---------------- TAB & QUIZ LOGIC ---------------- //
+        function openTab(evt, tabName) {
+            document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
+            document.querySelectorAll(".tab-btn").forEach(el => { el.classList.remove("active"); el.classList.remove("quiz-active"); });
+            document.getElementById(tabName).style.display = "block";
+            if(tabName === 'quiz-tab') evt.currentTarget.classList.add("quiz-active");
+            else evt.currentTarget.classList.add("active");
+        }
+        function updateStudentList() {
+            let cls = document.getElementById("classSelect").value;
+            let sel = document.getElementById("nameSelect");
+            sel.innerHTML = '<option value="">-- សូមជ្រើសរើសឈ្មោះរបស់អ្នក --</option>';
+            sel.innerHTML += document.getElementById(cls === "G10A" ? "names-10A" : "names-10B").innerHTML;
+        }
+        window.onload = updateStudentList;
+        function showModal(msg) { document.getElementById("modalMessage").innerText = msg; document.getElementById("successModal").style.display = "flex"; }
+        function closeModal() { document.getElementById("successModal").style.display = "none"; }
+
+        function submitQuiz() {
+            let cls = document.getElementById('classSelect').value;
+            let name = document.getElementById('nameSelect').value;
+            if (!cls || !name) return alert("សូមជ្រើសរើសឈ្មោះ និងថ្នាក់!");
+            let score = 0, count = 0;
+            for (let i = 1; i <= 5; i++) {
+                let rad = document.getElementsByName('q' + i);
+                for (let r of rad) if (r.checked) { score += parseInt(r.value); count++; break; }
+            }
+            if (count < 5) return alert("សូមឆ្លើយសំណួរឱ្យបានគ្រប់ទាំង ៥!");
+            
+            let btn = document.getElementById('submitBtn'); btn.innerText = "កំពុងបញ្ជូន..."; btn.disabled = true;
+            
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbz5KZrBEEpfyrMQAWoSuoSgCdlPq8DQ_eBdn4ewWGrrD0uVKjFNiqQHQn16uJOBi91nTA/exec';
+            let fd = new URLSearchParams();
+            fd.append("sheetName", cls); fd.append("name", name); fd.append("score", score); 
+            fd.append("quizNumber", "Q3"); // ទម្លាក់ចូល Q3 (Column G)
+
+            if(scriptURL.includes('YOUR_GOOGLE')) {
+                alert("សូមដាក់ Web App URL នៅក្នុងកូដជាមុនសិន!");
+                btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false; return;
+            }
+            fetch(scriptURL, { method: "POST", body: fd })
+            .then(r => r.text()).then(res => {
+                btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false;
+                if(res === "Success") showModal(`ពិន្ទុរបស់អ្នកទទួលបាន ${score}/50 ពិន្ទុ\nត្រូវបានបញ្ជូនចូលបញ្ជីថ្នាក់ ${cls} រួចរាល់!`);
+                else alert("មានបញ្ហា៖ " + res);
+            }).catch(err => { alert("មានបញ្ហាបណ្តាញទាក់ទង!"); btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false; });
+        }
+
+        // ---------------- SIMULATION LOGIC ---------------- //
+        var sliderM = document.getElementById('sliderM'), sliderV0 = document.getElementById('sliderV0'), valM = document.getElementById('valM'), valV0 = document.getElementById('valV0');
+        var objRect = document.getElementById('objRect'), lblM = document.getElementById('lblM'), vecW = document.getElementById('vecW'), headW = document.getElementById('headW');
+        var vecFb = document.getElementById('vecFb'), headFb = document.getElementById('headFb'), depthGroup = document.getElementById('depthGroup');
+        var hBotLine = document.getElementById('hBotLine'), hVertLine = document.getElementById('hVertLine'), hArrTop = document.getElementById('hArrTop'), hArrBot = document.getElementById('hArrBot'), txtHw = document.getElementById('txtHw');
+        
+        var targetBottomY = 240, currentBottomY = 240, isAnimating = false;
+        var mass = 5.0, vol = 8.0, areaCm2 = 400, surfaceY = 240, tankBotY = 498, pxPerCm = 6; 
+
+        function loopAnimation() {
+            var diff = targetBottomY - currentBottomY;
+            if (diff.toFixed(1) !== "0.0" && diff.toFixed(1) !== "-0.0") {
+                currentBottomY += diff * 0.15; drawGraphics(); requestAnimationFrame(loopAnimation);
+            } else { currentBottomY = targetBottomY; drawGraphics(); isAnimating = false; }
+        }
+
+        function drawGraphics() {
+            var h0_cm = (vol * 1000) / areaCm2, h0_px = h0_cm * pxPerCm, topY = currentBottomY - h0_px;
+            objRect.setAttribute("y", topY); objRect.setAttribute("height", h0_px); lblM.setAttribute("y", topY + (h0_px / 2) + 7);
+            var centerY = topY + (h0_px / 2), wLen = mass * 15, wEndY = centerY + wLen;
+            vecW.setAttribute("y1", centerY); vecW.setAttribute("y2", wEndY); headW.setAttribute("points", "245," + wEndY + " 255," + wEndY + " 250," + (wEndY + 10));
+            
+            var submergedPx = Math.max(0, currentBottomY - surfaceY), actualSubPx = Math.min(submergedPx, h0_px);
+            var fbMassEq = (actualSubPx / pxPerCm) * areaCm2 / 1000, fbLen = fbMassEq * 15, fbEndY = centerY - fbLen;
+            vecFb.setAttribute("y1", centerY); vecFb.setAttribute("y2", fbEndY); headFb.setAttribute("points", "245," + fbEndY + " 255," + fbEndY + " 250," + (fbEndY - 10));
+
+            var isFloatingPartially = (currentBottomY !== surfaceY && currentBottomY !== tankBotY);
+            if (isFloatingPartially) {
+                depthGroup.style.opacity = "1"; hBotLine.setAttribute("y1", currentBottomY); hBotLine.setAttribute("y2", currentBottomY); hVertLine.setAttribute("y2", currentBottomY);
+                hArrBot.setAttribute("points", "146," + (currentBottomY - 10) + " 154," + (currentBottomY - 10) + " 150," + currentBottomY);
+                txtHw.setAttribute("y", surfaceY + (currentBottomY - surfaceY)/2);
+            } else depthGroup.style.opacity = "0";
+        }
+
+        function updatePhysics() {
+            mass = parseFloat(sliderM.value); vol = parseFloat(sliderV0.value);
+            valM.innerText = mass.toFixed(1); valV0.innerText = vol.toFixed(1);
+            var rhoObj = (mass / vol) * 1000, isFloating = (Math.max(rhoObj, 1000) === 1000); 
+            var h0_cm = (vol * 1000) / areaCm2, vw_L = 0, hw_cm = 0, status = "";
+
+            if (isFloating) {
+                vw_L = mass; hw_cm = (vw_L * 1000) / areaCm2; targetBottomY = surfaceY + (hw_cm * pxPerCm); status = "អណ្តែត"; objRect.setAttribute("fill", "#8d6e63");
+            } else {
+                vw_L = vol; hw_cm = h0_cm; targetBottomY = tankBotY; status = "លិចដល់បាត"; objRect.setAttribute("fill", "#90a4ae");
+            }
+            document.getElementById('liveRho').innerText = Math.round(rhoObj) + " kg/m\u00B3"; document.getElementById('liveState').innerText = status;
+            document.getElementById('liveVw').innerText = vw_L.toFixed(2) + " L"; document.getElementById('liveHw').innerText = hw_cm.toFixed(1) + " cm";
+
+            if (!isAnimating) { isAnimating = true; loopAnimation(); }
+        }
+        sliderM.addEventListener('input', updatePhysics); sliderV0.addEventListener('input', updatePhysics);
+        updatePhysics();
+    </script>
+</body>
+</html>
